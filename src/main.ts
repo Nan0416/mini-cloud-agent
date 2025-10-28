@@ -1,3 +1,4 @@
+import 'source-map-support/register';
 import './logger-setup';
 import '@sparrow/node-exception-captors';
 

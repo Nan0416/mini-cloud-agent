@@ -23,9 +23,11 @@ export interface StageConfig {
 }
 
 function getStageConfig(stage: STAGE): StageConfig {
-  const stdErrDir = path.join(getenv('HOME'), 'task-outputs', stage, 'stderr');
-  const stdOutDir = path.join(getenv('HOME'), 'task-outputs', stage, 'stdout');
-  const offlineReportPath = path.join(getenv('HOME'), 'task-outputs', stage, `offline-reports.reports`);
+  const dirPath =  getenv('MINI_CLOUD_AGENT_DIR');
+  const agentId = getenv('AGENT_ID');
+  const stdErrDir = path.join(dirPath, agentId, 'stderr');
+  const stdOutDir = path.join(dirPath, agentId, 'stdout');
+  const offlineReportPath = path.join(dirPath, agentId, 'offline-reports.reports');
 
   const temp = process.env['PASSIVE_HEALTH_CHECK_TOLERANCE_BUFFER'];
   let passiveHealthCheckToleranceBuffer = 2000;
@@ -42,13 +44,13 @@ function getStageConfig(stage: STAGE): StageConfig {
     websocketBaseUrl: 'ws://localhost:3050',
     agentPort: 4000,
     taskTopic: '_task',
-    agentId: getenv('AGENT_ID'),
+    agentId: agentId,
     agentName: getenv('AGENT_NAME'),
     offlineReportPath: offlineReportPath,
     passiveHealthCheckToleranceBuffer: passiveHealthCheckToleranceBuffer,
     variableReplacementConfig: {
-      home: getenv('HOME'),
-      projectDir: `${getenv('HOME')}/${stage}`,
+      home: dirPath,
+      projectDir: dirPath,
       stderrDir: stdErrDir,
       stdoutDir: stdOutDir,
     },

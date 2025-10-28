@@ -35,8 +35,8 @@ export class TaskClientForAgentImpl implements TaskClientForAgent {
     logger.info(`Send request to list running task instances on agent ${request.agentId}`);
     const response = await this.httpClient.send<ListRunningInstancesResponse>({
       method: 'GET',
-      url: '/task-instances',
-      query: { status: 'running' },
+      url: '/task/running-task-instances',
+      query: { agentId: request.agentId },
     });
     return response.body;
   }
@@ -45,7 +45,7 @@ export class TaskClientForAgentImpl implements TaskClientForAgent {
     logger.info(`Send request to list health checks.`);
     const response = await this.httpClient.send<ListHealthChecksResponse>({
       method: 'POST',
-      url: '/health-checks',
+      url: '/task/health-checks',
       body: request,
     });
     return response.body;
@@ -55,7 +55,7 @@ export class TaskClientForAgentImpl implements TaskClientForAgent {
     logger.info(`Send request to report task instance ${request.taskInstanceId} ${request.level} event.`);
     const response = await this.httpClient.send<ListHealthChecksResponse>({
       method: 'POST',
-      url: '/instance-event',
+      url: '/task/instance-event',
       body: request,
     });
     return response.body;
@@ -65,7 +65,7 @@ export class TaskClientForAgentImpl implements TaskClientForAgent {
     logger.info(`Send request to report task instance ${request.taskInstanceId} pid ${request.pid}`);
     const response = await this.httpClient.send<ReportTaskInstancePidResponse>({
       method: 'POST',
-      url: '/instance-pid',
+      url: '/task/instance-pid',
       body: request,
     });
     return response.body;
@@ -75,7 +75,7 @@ export class TaskClientForAgentImpl implements TaskClientForAgent {
     logger.info(`Send request to report task instance ${request.taskInstanceId} status ${request.status}`);
     const response = await this.httpClient.send<ReportTaskInstanceStatusResponse>({
       method: 'POST',
-      url: '/instance-status',
+      url: '/task/instance-status',
       body: request,
     });
     return response.body;
@@ -85,7 +85,7 @@ export class TaskClientForAgentImpl implements TaskClientForAgent {
     logger.debug(`Send request to report task agent status.`);
     const response = await this.httpClient.send<ReportAgentStatusResponse>({
       method: 'POST',
-      url: '/agent-status',
+      url: '/task/agent-status',
       body: request,
     });
     return response.body;
