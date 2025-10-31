@@ -1,10 +1,10 @@
-import { LoggerFactory } from '@sparrow/logging-js';
-import { ExitCode, OfflineTaskReport, TaskEventLevel, TaskReporterClient } from '../../models';
+import { LoggerFactory } from '@ultrasa/dev-kit';
+import { ExitCode, OfflineTaskReport, TaskEventLevel, TaskReporterClient } from '@ultrasa/mini-cloud-models';
 import { appendFile } from 'fs/promises';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { TaskReporterClientImpl } from './task-reporter-client-impl';
-import { AxiosHttpClient } from '@sparrow/axios-http-client';
+import { AxiosHttpClient } from '@ultrasa/axios-http-client';
 
 const logger = LoggerFactory.getLogger('TaskReporter');
 

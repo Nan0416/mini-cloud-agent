@@ -1,18 +1,19 @@
 import 'source-map-support/register';
 import './logger-setup';
-import '@sparrow/node-exception-captors';
+import { enableExceptionCatpors } from '@ultrasa/dev-kit';
+enableExceptionCatpors();
 
-import { LoggerFactory } from '@sparrow/logging-js';
+import { LoggerFactory } from '@ultrasa/dev-kit';
 import config from './stage-config';
 import { StatefulWsSubscriber, NodeSubscriberImpl } from './utilities/message-clients';
 import { TaskLauncher, VariableReplacement, PassiveHealthCheckManager, PingHealthCheckManager, TaskAgentHandlerImpl, TaskClientForAgentImpl, TaskAgentHandler } from './core';
 import { mkdirSync } from 'fs';
 import path from 'path';
-import { AxiosHttpClient } from '@sparrow/axios-http-client';
-import { TaskAgentRequestEvent } from './models/clients/task-agent-client';
+import { AxiosHttpClient } from '@ultrasa/axios-http-client';
 import { AsyncHandler, TaskAgentEndpoints } from './endpoints';
 import { AgentService } from './endpoints/service';
 import { Server } from 'http';
+import { TaskAgentRequestEvent } from '@ultrasa/mini-cloud-models';
 
 const logger = LoggerFactory.getLogger('main-agent');
 

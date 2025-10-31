@@ -1,6 +1,5 @@
-import { LoggerFactory } from '@sparrow/logging-js';
+import { asleep, LoggerFactory } from '@ultrasa/dev-kit';
 import { RetryBackoff } from './models';
-import { asleep } from './utilities';
 
 export interface LinearBackoffProps {
   readonly minimumBackoff: number;

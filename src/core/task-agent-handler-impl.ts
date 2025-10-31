@@ -1,7 +1,15 @@
-import { LoggerFactory } from '@sparrow/logging-js';
+import { LoggerFactory } from '@ultrasa/dev-kit';
 import {
   AgentSideTaskStatus,
   HealthCheck,
+  InternalGetAgentStatusRequest,
+  InternalGetAgentStatusResponse,
+  InternalLaunchTaskInstanceRequest,
+  InternalLaunchTaskInstanceResponse,
+  InternalTerminateAgentRequest,
+  InternalTerminateAgentResponse,
+  InternalTerminateTaskInstanceRequest,
+  InternalTerminateTaskInstanceResponse,
   OfflineTaskReport,
   ReportEventRequest,
   ReportEventResponse,
@@ -17,8 +25,7 @@ import {
   TaskEventLevel,
   TaskIdentifier,
   TaskInstance,
-} from '../models';
-import { InternalLaunchTaskInstanceRequest } from './internal-models';
+} from '@ultrasa/mini-cloud-models';
 import { PassiveHealthCheckManager } from './passive-health-check-manager';
 import { PingHealthCheckManager } from './ping-health-check-manager';
 import { TaskLauncher } from './task-launcher';
@@ -27,16 +34,6 @@ import { readFile, unlink } from 'fs/promises';
 import { HealthCheckResult } from './health-check-manager';
 import { healthCheckResultsDelta } from './utilities';
 import { TaskAgentHandler } from './task-agent-handler';
-import {
-  GetAgentStatusRequest,
-  GetAgentStatusResponse,
-  LaunchTaskInstanceRequest,
-  LaunchTaskInstanceResponse,
-  TerminateAgentRequest,
-  TerminateAgentResponse,
-  TerminateTaskInstanceRequest,
-  TerminateTaskInstanceResponse,
-} from '../models/clients/task-agent-client';
 
 const logger = LoggerFactory.getLogger('TaskAgentHandlerImpl');
 
@@ -104,7 +101,7 @@ export class TaskAgentHandlerImpl implements TaskAgentHandler {
     this.instanceIdToHealthCheck.clear();
   }
 
-  async terminateAgent(request: TerminateAgentRequest): Promise<TerminateAgentResponse> {
+  async terminateAgent(request: InternalTerminateAgentRequest): Promise<InternalTerminateAgentResponse> {
     logger.info('Perform self termination.');
     process.kill(process.pid, 'SIGINT');
     return {};
@@ -114,12 +111,16 @@ export class TaskAgentHandlerImpl implements TaskAgentHandler {
    * replace variables, launch the task, track health check, report instance status.
    * @param launchRequest
    */
-  async launchTaskInstance(request: LaunchTaskInstanceRequest): Promise<LaunchTaskInstanceResponse> {
+  async launchTaskInstance(request: InternalLaunchTaskInstanceRequest): Promise<InternalLaunchTaskInstanceResponse> {
     try {
       logger.info(`Launch task ${request.taskId} version ${request.version} with assigned task instance id ${request.taskInstanceId}`);
-      const internalRequest = this.convertLaunchTaskInstanceRequestToInternalLaunchTaskInstanceRequest(request);
-      const requestAfterReplacement = await this.variableReplacement.replace(internalRequest);
-      await this.taskLauncher.launch(requestAfterReplacement);
+      const requestAfterReplacement = await this.variableReplacement.replace(request);
+
+      await this.taskLauncher.launch(requestAfterReplacement, {
+        passiveHealthCheckDuration: request.healthCheck?.type === 'passive' ? this.passiveHealthCheckManager.getPeriodInMs(request.healthCheck) : undefined,
+        offlineReportPath: this.offlineReportPath,
+      });
+
       const message = `Successfully launched task instance ${request.taskInstanceId}`;
       logger.info(message);
       await this.reportStatusAndEvent(request.taskInstanceId, 'launched', 'success', message);
@@ -136,29 +137,10 @@ export class TaskAgentHandlerImpl implements TaskAgentHandler {
     return {};
   }
 
-  private convertLaunchTaskInstanceRequestToInternalLaunchTaskInstanceRequest(request: LaunchTaskInstanceRequest): InternalLaunchTaskInstanceRequest {
-    const passiveHealthCheckDuration = request.healthCheck?.type === 'passive' ? this.passiveHealthCheckManager.getPeriodInMs(request.healthCheck) : undefined;
-
-    const temp: InternalLaunchTaskInstanceRequest = {
-      taskId: request.taskId,
-      version: request.version,
-      instanceId: request.taskInstanceId,
-      cmd: request.cmd,
-      cwd: request.cwd,
-      arguments: request.arguments,
-      env: request.env,
-      stdout: request.stdout,
-      stderr: request.stderr,
-      passiveHealthCheckDuration: passiveHealthCheckDuration,
-      offlineReportPath: this.offlineReportPath,
-    };
-    return temp;
-  }
-
   /**
    * terminate pid and report status.
    */
-  async terminateTaskInstance(request: TerminateTaskInstanceRequest): Promise<TerminateTaskInstanceResponse> {
+  async terminateTaskInstance(request: InternalTerminateTaskInstanceRequest): Promise<InternalTerminateTaskInstanceResponse> {
     logger.info(`terminate task instance ${request.taskInstanceId} pid ${request.pid}`);
     try {
       process.kill(request.pid, 'SIGINT');
@@ -184,7 +166,7 @@ export class TaskAgentHandlerImpl implements TaskAgentHandler {
     return {};
   }
 
-  async getAgentStatus(request: GetAgentStatusRequest): Promise<GetAgentStatusResponse> {
+  async getAgentStatus(request: InternalGetAgentStatusRequest): Promise<InternalGetAgentStatusResponse> {
     logger.info('Received agent status request.');
     await this.client.reportAgentStatus({
       agentId: this.agentId,

@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { LoggerFactory } from '@sparrow/logging-js';
+import { LoggerFactory } from '@ultrasa/dev-kit';
 import { Endpoints } from './endpoints';
 import { TaskAgentHandler } from '../core';
 import { TaskAgentRequestAssertions } from './task-agent-request-assertions';

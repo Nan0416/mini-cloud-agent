@@ -1,12 +1,10 @@
 import { spawn, SpawnOptions } from 'child_process';
-import { LoggerFactory } from '@sparrow/logging-js';
-import { Metrics } from '@sparrow/metrics-types';
+import { LoggerFactory, Metrics, MetricsContext } from '@ultrasa/dev-kit';
 import { createWriteStream } from 'fs';
 import { Stream } from 'stream';
-import { InternalLaunchTaskInstanceRequest } from './internal-models';
 import { mkdir } from 'fs/promises';
 import path from 'path';
-import { MetricsContext } from '@sparrow/metrics-logger';
+import { InternalLaunchTaskInstanceRequest } from '@ultrasa/mini-cloud-models';
 
 const ENV_ALLOWLIST = ['SHELL', 'PATH', 'USER', 'HOME', 'PWD', 'PYTHONPATH'];
 
@@ -21,6 +19,11 @@ const LAUNCH_TASK_INSTANCE = 'LaunchTaskInstance';
 const LAUNCH_FAILURE_COUNT = 'LaunchFailure.Count';
 const logger = LoggerFactory.getLogger('TaskLauncher');
 
+export interface LaunchLocalContext {
+  readonly passiveHealthCheckDuration?: number;
+  readonly offlineReportPath: string;
+}
+
 export class TaskLauncher {
   private readonly metrics: Metrics;
   private readonly agentId: string;
@@ -30,12 +33,12 @@ export class TaskLauncher {
     this.metrics = MetricsContext.getMetrics();
   }
 
-  async launch(request: InternalLaunchTaskInstanceRequest): Promise<void> {
+  async launch(request: InternalLaunchTaskInstanceRequest, context: LaunchLocalContext): Promise<void> {
     logger.info(
-      `launch task ${request.taskId} version ${request.version} assigned instance id ${request.instanceId}` +
+      `launch task ${request.taskId} version ${request.version} assigned instance id ${request.taskInstanceId}` +
         ` cmd ${request.cmd} cwd ${request.cwd} stdout ${request.stdout} stderr ${request.stderr}` +
         ` arguments ${request.arguments?.join(' ')} env ${JSON.stringify(request.env)}` +
-        ` passiveHealthCheckDuration ${request.passiveHealthCheckDuration}`,
+        ` passiveHealthCheckDuration ${context.passiveHealthCheckDuration}`,
     );
 
     const stdoutStream = await this.buildStdio(request.stdout);
@@ -45,15 +48,15 @@ export class TaskLauncher {
       // it's necessary to supply some environment for a program to run,
       ...INHERIT_ENV_VARIABLES,
       ...request.env,
-      TASK_INSTANCE_ID: request.instanceId, // required by task reporter
+      TASK_INSTANCE_ID: request.taskInstanceId, // required by task reporter
       TASK_ID: request.taskId,
       TASK_VERSION: request.version.toString(),
       AGENT_ID: this.agentId,
-      OFFLINE_REPORT_PATH: request.offlineReportPath,
+      OFFLINE_REPORT_PATH: context.offlineReportPath,
     };
 
-    if (typeof request.passiveHealthCheckDuration === 'number') {
-      env['PASSIVE_HEALTH_CHECK_DURATION'] = request.passiveHealthCheckDuration.toString();
+    if (typeof context.passiveHealthCheckDuration === 'number') {
+      env['PASSIVE_HEALTH_CHECK_DURATION'] = context.passiveHealthCheckDuration.toString();
     }
 
     await this.metrics.asyncCall(async () => {
@@ -79,7 +82,7 @@ export class TaskLauncher {
       });
 
       // the pid may not be the task pid.
-      logger.info(`launched task task ${request.taskId} version ${request.version} instance id ${request.instanceId} pid ${childProcess.pid}`);
+      logger.info(`launched task task ${request.taskId} version ${request.version} instance id ${request.taskInstanceId} pid ${childProcess.pid}`);
     }, LAUNCH_TASK_INSTANCE);
   }
 
