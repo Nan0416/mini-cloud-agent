@@ -5,7 +5,7 @@ enableExceptionCatpors();
 
 import { LoggerFactory } from '@ultrasa/dev-kit';
 import config from './stage-config';
-import { StatefulWsSubscriber, NodeSubscriberImpl } from './utilities/message-clients';
+import { StatefulWsSubscriber, NodeSubscriberImpl } from '@ultrasa/mini-cloud-kit';
 import { TaskLauncher, VariableReplacement, PassiveHealthCheckManager, PingHealthCheckManager, TaskAgentHandlerImpl, TaskClientForAgentImpl, TaskAgentHandler } from './core';
 import { mkdirSync } from 'fs';
 import path from 'path';
