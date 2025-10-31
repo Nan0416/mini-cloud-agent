@@ -1,5 +1,4 @@
-import { APPLICATION_NAME_KEY } from '@sparrow/standard-error';
-import { getenv, STAGE, stage } from '@sparrow/utilities';
+import { getenv } from '@ultrasa/dev-kit';
 import path from 'path';
 
 export interface VariableReplacementConfig {
@@ -22,8 +21,11 @@ export interface StageConfig {
   readonly passiveHealthCheckToleranceBuffer: number;
 }
 
-function getStageConfig(stage: STAGE): StageConfig {
-  const dirPath =  getenv('MINI_CLOUD_AGENT_DIR');
+export type Stage = 'beta' | 'prod';
+export const STAGES: ReadonlyArray<Stage> = ['beta', 'prod'];
+
+function getStageConfig(stage: Stage): StageConfig {
+  const dirPath = getenv('MINI_CLOUD_AGENT_DIR');
   const agentId = getenv('AGENT_ID');
   const stdErrDir = path.join(dirPath, agentId, 'stderr');
   const stdOutDir = path.join(dirPath, agentId, 'stdout');
@@ -39,7 +41,7 @@ function getStageConfig(stage: STAGE): StageConfig {
   }
 
   return {
-    appName: getenv(APPLICATION_NAME_KEY),
+    appName: getenv('APPLICATION_NAME'),
     serviceBaseUrl: 'http://localhost:3000',
     websocketBaseUrl: 'ws://localhost:3050',
     agentPort: 4000,
@@ -57,6 +59,6 @@ function getStageConfig(stage: STAGE): StageConfig {
   };
 }
 
-const config = getStageConfig(stage());
+const config = getStageConfig(getenv('STAGE', STAGES));
 
 export default config;

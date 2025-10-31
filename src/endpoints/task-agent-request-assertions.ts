@@ -1,6 +1,6 @@
-import { BaseRequestAssertions } from '@sparrow/common-express-middlewares';
+import { BaseRequestAssertions } from '@ultrasa/express-middlewares';
 import { JSONSchemaType } from 'ajv';
-import { InvalidRequestError, ReportEventRequest, ReportExitRequest, ReportPassiveHealthCheckRequest, ReportPidRequest, ReportTerminationRequest, TASK_EVENT_LEVELS } from '../models';
+import { InvalidRequestError, ReportEventRequest, ReportExitRequest, ReportPassiveHealthCheckRequest, ReportPidRequest, ReportTerminationRequest, TASK_EVENT_LEVELS } from '@ultrasa/mini-cloud-models';
 
 export class TaskAgentRequestAssertions extends BaseRequestAssertions {
   constructor() {

@@ -1,5 +1,5 @@
+import { InternalLaunchTaskInstanceRequest } from '@ultrasa/mini-cloud-models';
 import { VariableReplacementConfig } from '../stage-config';
-import { InternalLaunchTaskInstanceRequest } from './internal-models';
 import lodash from 'lodash';
 
 export class VariableReplacement {
@@ -21,15 +21,13 @@ export class VariableReplacement {
     return {
       taskId: request.taskId,
       version: request.version,
-      instanceId: request.instanceId,
+      taskInstanceId: request.taskInstanceId,
       cmd: this.replaceString(request.cmd),
       cwd: this.replaceString(request.cwd),
       arguments: _arguments,
       env: newEnv,
       stderr: request.stderr ? this.replaceString(request.stderr) : undefined,
       stdout: request.stdout ? this.replaceString(request.stdout) : undefined,
-      passiveHealthCheckDuration: request.passiveHealthCheckDuration,
-      offlineReportPath: request.offlineReportPath,
     };
   }
 

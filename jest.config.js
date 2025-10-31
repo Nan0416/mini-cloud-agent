@@ -19,7 +19,7 @@ module.exports = {
   reporters: [
     'default',
     ['jest-junit', {
-      suiteName: 'MiniCloud',
+      suiteName: 'mini-cloud-agent',
       outputDirectory: 'reports/test-reports',
       outputName: 'junit.xml'
     }]

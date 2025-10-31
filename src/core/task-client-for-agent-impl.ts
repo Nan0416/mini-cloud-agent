@@ -1,4 +1,4 @@
-import { LoggerFactory } from '@sparrow/logging-js';
+import { LoggerFactory, HttpClient } from '@ultrasa/dev-kit';
 import {
   ERROR_NAME_TO_CONSTRUCTOR,
   InternalServiceError,
@@ -15,8 +15,7 @@ import {
   ReportTaskInstanceStatusRequest,
   ReportTaskInstanceStatusResponse,
   TaskClientForAgent,
-} from '../models';
-import { HttpClient } from '@sparrow/http-client';
+} from '@ultrasa/mini-cloud-models';
 
 const logger = LoggerFactory.getLogger('TaskClientForAgentImpl');
 

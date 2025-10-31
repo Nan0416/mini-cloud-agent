@@ -1,5 +1,4 @@
-import { TaskReporterClient } from '../models';
-import { TaskAgentClient } from '../models/clients/task-agent-client';
+import { TaskAgentClient, TaskReporterClient } from '@ultrasa/mini-cloud-models';
 
 /**
  * Implemented by task agent, and run in task agent.

@@ -1,6 +1,5 @@
-import { LoggerFactory } from '@sparrow/logging-js';
-import { PingHealthCheck } from '../models';
-import { HttpClient } from '@sparrow/http-client';
+import { LoggerFactory, HttpClient } from '@ultrasa/dev-kit';
+import { PingHealthCheck } from '@ultrasa/mini-cloud-models';
 import { HealthCheckManager, HealthCheckResult } from './health-check-manager';
 import lodash from 'lodash';
 

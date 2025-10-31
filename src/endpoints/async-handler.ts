@@ -1,7 +1,7 @@
-import { LoggerFactory } from '@sparrow/logging-js';
+import { LoggerFactory } from '@ultrasa/dev-kit';
 import { AsyncQueue } from '../utilities';
 import { TaskAgentHandler } from '../core';
-import { TaskAgentRequestEvent } from '../models/clients/task-agent-client';
+import { TaskAgentRequestEvent } from '@ultrasa/mini-cloud-models';
 
 const logger = LoggerFactory.getLogger('AsyncHandler');
 

@@ -1,5 +1,5 @@
-import { LoggerFactory } from '@sparrow/logging-js';
-import { PassiveHealthCheck } from '../models';
+import { LoggerFactory } from '@ultrasa/dev-kit';
+import { PassiveHealthCheck } from '@ultrasa/mini-cloud-models';
 import { HealthCheckManager, HealthCheckResult } from './health-check-manager';
 
 const logger = LoggerFactory.getLogger('PassiveHealthCheckManager');
